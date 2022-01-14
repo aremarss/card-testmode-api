@@ -1,28 +1,28 @@
+package test;
+
 import com.codeborne.selenide.Configuration;
-import com.github.javafaker.Faker;
+import data.RegistrationByCardInfo;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Locale;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
+import static data.DataGenerator.fakeUser;
+import static data.DataGenerator.regNewUser;
 import static java.time.Duration.ofSeconds;
 
 public class CardOrderTestV1 {
 
     @BeforeAll
     static void setUp() {
-        Configuration.headless = true;
+        Configuration.headless = false;
     }
-
-    Faker faker = new Faker(new Locale("en"));
 
     @Test
     void shouldReturnActiveUser() {
-        RegistrationByCardInfo info = DataGenerator.regActiveUser();
+        RegistrationByCardInfo info = regNewUser("active");
         open("http://localhost:9999/");
         $("[data-test-id='login'] input").setValue(info.getLogin());
         $("[data-test-id='password'] input").setValue(info.getPassword());
@@ -32,7 +32,7 @@ public class CardOrderTestV1 {
 
     @Test
     void shouldReturnBlockedUser() {
-        RegistrationByCardInfo info = DataGenerator.regBlockedUser();
+        RegistrationByCardInfo info = regNewUser("blocked");
         open("http://localhost:9999/");
         $("[data-test-id='login'] input").setValue(info.getLogin());
         $("[data-test-id='password'] input").setValue(info.getPassword());
@@ -42,19 +42,19 @@ public class CardOrderTestV1 {
 
     @Test
     void shouldReturnFailWithInvalidPassword() {
-        RegistrationByCardInfo info = DataGenerator.regActiveUser();
+        RegistrationByCardInfo info = regNewUser("active");
         open("http://localhost:9999/");
         $("[data-test-id='login'] input").setValue(info.getLogin());
-        $("[data-test-id='password'] input").setValue(faker.internet().password());
+        $("[data-test-id='password'] input").setValue(fakeUser().getPassword());
         $("[data-test-id='action-login'] .button__content").click();
         $(byText("Ошибка")).shouldBe(visible, ofSeconds(15));
     }
 
     @Test
     void shouldReturnFailWithInvalidLogin() {
-        RegistrationByCardInfo info = DataGenerator.regActiveUser();
+        RegistrationByCardInfo info = regNewUser("active");
         open("http://localhost:9999/");
-        $("[data-test-id='login'] input").setValue(faker.name().username());
+        $("[data-test-id='login'] input").setValue(fakeUser().getLogin());
         $("[data-test-id='password'] input").setValue(info.getPassword());
         $("[data-test-id='action-login'] .button__content").click();
         $(byText("Ошибка")).shouldBe(visible, ofSeconds(15));
@@ -63,8 +63,8 @@ public class CardOrderTestV1 {
     @Test
     void shouldReturnFailWithInvalidLoginAndPassword() {
         open("http://localhost:9999/");
-        $("[data-test-id='login'] input").setValue(faker.name().username());
-        $("[data-test-id='password'] input").setValue(faker.internet().password());
+        $("[data-test-id='login'] input").setValue(fakeUser().getLogin());
+        $("[data-test-id='password'] input").setValue(fakeUser().getPassword());
         $("[data-test-id='action-login'] .button__content").click();
         $(byText("Ошибка")).shouldBe(visible, ofSeconds(15));
     }
