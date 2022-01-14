@@ -17,7 +17,7 @@ public class CardOrderTestV1 {
 
     @BeforeAll
     static void setUp() {
-        Configuration.headless = false;
+        Configuration.headless = true;
     }
 
     @Test
